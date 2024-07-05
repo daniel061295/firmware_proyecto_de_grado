@@ -26,8 +26,12 @@ ESP32Time rtc(3600); // offset in seconds GMT+1
 const int csPin = 18; // LoRa radio chip select
 
 // wifi casa para pruebas
-const char *ssid = "FAMILIA TORRES CARDENAS";
-const char *password = "YULIANAAMORMIO";
+// const char *ssid = "FAMILIA TORRES CARDENAS";
+// const char *password = "YULIANAAMORMIO";
+
+// wifi oficina
+const char *ssid = "WMSAS-TALLER";
+const char *password = "303wm2021";
 
 //---- MQTT Broker settings
 const char *mqtt_server = "a33454d332054780b8feaf83950ed54a.s2.eu.hivemq.cloud"; // replace with your broker url
@@ -227,6 +231,17 @@ struct tm timeinfo = rtc.getTimeStruct();
     publishMessage(topic_mqtt, mensaje, true);
     doc.clear();
     mensaje = "";
+    Heltec.display->clear();
+    Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
+    Heltec.display->setFont(ArialMT_Plain_10);
+    Heltec.display->drawString(0, 0, "Id nodo: ");
+    Heltec.display->drawString(90, 0, "0");
+    Heltec.display->drawString(0, 15, "Temperatura: ");
+    Heltec.display->drawString(90, 15, String(vars[0]));
+    Heltec.display->drawString(0, 30, "Humedad: ");
+    Heltec.display->drawString(90, 30, String(vars[1]));
+    Heltec.display->drawString(0, 45, String(dateTime));
+    Heltec.display->display();
     flag = false;
   }
 }

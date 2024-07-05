@@ -16,7 +16,7 @@ float temp;
 float hum;
 unsigned long startMillis; // some global variables available anywhere in the program
 unsigned long currentMillis;
-const unsigned long period = 120000;
+const unsigned long period = 60000*30;
 bool lectura_exitosa = false;
 void setup()
 {
