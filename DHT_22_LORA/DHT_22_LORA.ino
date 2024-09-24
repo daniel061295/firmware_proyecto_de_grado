@@ -16,7 +16,7 @@ float temp;
 float hum;
 unsigned long startMillis; // some global variables available anywhere in the program
 unsigned long currentMillis;
-const unsigned long period = 60000*30;
+const unsigned long period = 1800e3;
 bool lectura_exitosa = false;
 void setup()
 {
@@ -118,8 +118,8 @@ void loop()
   
         Heltec.display->drawString(0, 0, "Temperatura: ");
         Heltec.display->drawString(90, 0, String(temp));
-        Heltec.display->drawString(0, 30, "Humedad: ");
-        Heltec.display->drawString(90, 30, String(hum));
+        Heltec.display->drawString(0, 15, "Humedad: ");
+        Heltec.display->drawString(90, 15, String(hum));
         Heltec.display->display();
         startMillis = currentMillis;
     }

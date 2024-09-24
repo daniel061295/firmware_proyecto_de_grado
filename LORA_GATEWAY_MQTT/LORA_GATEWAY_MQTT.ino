@@ -18,6 +18,7 @@ uint32_t delayMS;
 double Ts = 120;
 float temp;
 float hum;
+bool firstTimeMqtt = false;
 
 const String id_nodo = "0";
 
@@ -26,12 +27,8 @@ ESP32Time rtc(3600); // offset in seconds GMT+1
 const int csPin = 18; // LoRa radio chip select
 
 // wifi casa para pruebas
-// const char *ssid = "FAMILIA TORRES CARDENAS";
-// const char *password = "YULIANAAMORMIO";
-
-// wifi oficina
-const char *ssid = "WMSAS-TALLER";
-const char *password = "303wm2021";
+const char *ssid = "FAMILIA TORRES CARDENAS";
+const char *password = "YULIANAAMORMIO";
 
 //---- MQTT Broker settings
 const char *mqtt_server = "a33454d332054780b8feaf83950ed54a.s2.eu.hivemq.cloud"; // replace with your broker url
@@ -56,10 +53,6 @@ char usec[30];
 bool timeflag = false;
 bool lectura_exitosa = false;
 
-char payload_json[100];
-char starting_time[50] = "9999-12-31 23:59:59";
-char ending_time[50] = "9999-12-31 23:59:59";
-String incommingMessage;
 
 // Initialize JSON Document with apropiate size
 DynamicJsonDocument doc(2048); // 4096
@@ -116,13 +109,21 @@ void setup_wifi()
 
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
+    Heltec.display->clear();
+    Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
+    Heltec.display->setFont(ArialMT_Plain_10);
 
+    Heltec.display->drawString(0, 0, "Connecting to: ");
+    Heltec.display->drawString(0, 15, String(ssid));
+    Heltec.display->display();
+    randomSeed(micros());
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(500);
         Serial.print(".");
     }
-    randomSeed(micros());
+    Heltec.display->drawString(0, 30, "Connected!");
+    Heltec.display->display();
     Serial.println("\nWiFi connected\nIP address: ");
     Serial.println(WiFi.localIP());
 
@@ -148,6 +149,12 @@ void reconnect()
         if (client.connect(clientId.c_str(), mqtt_username, mqtt_password))
         {
             Serial.println("connected");
+            if (firstTimeMqtt == false){
+            Heltec.display->drawString(0, 45, "MQTT:OK!");
+            Heltec.display->display(); 
+            firstTimeMqtt = true;
+              }
+            
         }
         else
         {
@@ -224,7 +231,7 @@ struct tm timeinfo = rtc.getTimeStruct();
     doc_0["temperatura"] = vars[0];
     doc_0["humedad"] = vars[1];
     // Serial.println(uxTaskGetStackHighWaterMark(NULL));
-  
+    
     Serial.print("Sending packet: ");
     serializeJson(doc, mensaje);
     Serial.println(mensaje);
@@ -234,13 +241,13 @@ struct tm timeinfo = rtc.getTimeStruct();
     Heltec.display->clear();
     Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
     Heltec.display->setFont(ArialMT_Plain_10);
-    Heltec.display->drawString(0, 0, "Id nodo: ");
-    Heltec.display->drawString(90, 0, "0");
-    Heltec.display->drawString(0, 15, "Temperatura: ");
-    Heltec.display->drawString(90, 15, String(vars[0]));
-    Heltec.display->drawString(0, 30, "Humedad: ");
-    Heltec.display->drawString(90, 30, String(vars[1]));
-    Heltec.display->drawString(0, 45, String(dateTime));
+
+    Heltec.display->drawString(0, 0, "Temperatura: ");
+    Heltec.display->drawString(90, 0, String(vars[0]));
+    Heltec.display->drawString(0, 15, "Humedad: ");
+    Heltec.display->drawString(90, 15, String(vars[1]));
+    Heltec.display->drawString(0, 30, "Timestamp:");
+    Heltec.display->drawString(0, 45, String(String(dateTime)));
     Heltec.display->display();
     flag = false;
   }
@@ -266,7 +273,6 @@ void onReceive(int packetSize)
       packet = packet.substring(index+1);
     }
   }
-//  temp = (float)vars[0];
   Serial.print("temperatura:");
   Serial.println(vars[0]);
   Serial.print("humedad:");
