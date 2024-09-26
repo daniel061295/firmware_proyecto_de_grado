@@ -8,7 +8,7 @@
 
 #define DHTPIN 17 // Digital pin connected to the DHT sensor
 
-#define DHTTYPE DHT22 // DHT 22 (AM2302)
+#define DHTTYPE DHT21 // DHT 22 (AM2302)
 
 DHT_Unified dht(DHTPIN, DHTTYPE);
 
@@ -16,7 +16,9 @@ float temp;
 float hum;
 unsigned long startMillis; // some global variables available anywhere in the program
 unsigned long currentMillis;
-const unsigned long period = 1800e3;
+int timeInMinutes = 5;
+const unsigned long period = timeInMinutes*60e3;
+//const unsigned long period = 60e3;
 bool lectura_exitosa = false;
 void setup()
 {
@@ -36,7 +38,7 @@ void setup()
     delay(1500);
     Heltec.display->clear();
   
-    Heltec.display->drawString(0, 0, "Te amo yuli <3");
+    Heltec.display->drawString(0, 0, "Esperando lecturas...");
     Heltec.display->display();
     delay(1000);
 }
@@ -52,9 +54,13 @@ void loop()
         {
             bool temp_flag = false;
             bool hum_flag = false;
+            temp = 0.0;
+            hum = 0.0;
+            
             sensors_event_t event;
             dht.temperature().getEvent(&event);
-            if (isnan(event.temperature))
+            temp = event.temperature;
+            if (isnan(temp) || temp == 1.0 || temp == 0.0)
             {
                 temp = 0.0;
                 Serial.println(F("Error reading temperature!"));
@@ -62,13 +68,15 @@ void loop()
             else
             {
                 Serial.print(F("Temperature: "));
-                temp = event.temperature;
+                
                 temp_flag = true;
-                Serial.print(event.temperature);
+                Serial.print(temp);
                 Serial.println(F("°C"));
             }
+            delay(2000);
             dht.humidity().getEvent(&event);
-            if (isnan(event.relative_humidity))
+            hum = event.relative_humidity;
+            if (isnan(hum) || hum == 1.0 || hum == 0.0)
             {
                 hum = 0.0;
                 Serial.println(F("Error reading humidity!"));
@@ -76,9 +84,9 @@ void loop()
             else
             {
                 Serial.print(F("Humidity: "));
-                hum = event.relative_humidity;
+                
                 hum_flag = true;
-                Serial.print(event.relative_humidity);
+                Serial.print(hum);
                 Serial.println(F("%"));
             }
             if ((temp_flag == true) && (hum_flag == true))
@@ -93,7 +101,7 @@ void loop()
                 Serial.print("Intentos:");
                 Serial.println(count_lect);
             }
-            delay(3000);
+            delay(2000);
         }
         
 
@@ -106,6 +114,9 @@ void loop()
          *   - RF_PACONFIG_PASELECT_PABOOST -- LoRa single output via PABOOST, maximum output 20dBm
          *   - RF_PACONFIG_PASELECT_RFO     -- LoRa single output via RFO_HF / RFO_LF, maximum output 14dBm
          */
+/*
+ * 
+ */
         LoRa.setTxPower(14, RF_PACONFIG_PASELECT_PABOOST);
         LoRa.print(temp);
         LoRa.print(",");

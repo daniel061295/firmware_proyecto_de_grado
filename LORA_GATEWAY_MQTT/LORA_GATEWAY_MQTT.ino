@@ -27,8 +27,10 @@ ESP32Time rtc(3600); // offset in seconds GMT+1
 const int csPin = 18; // LoRa radio chip select
 
 // wifi casa para pruebas
-const char *ssid = "FAMILIA TORRES CARDENAS";
-const char *password = "YULIANAAMORMIO";
+// const char *ssid = "FAMILIA TORRES CARDENAS";2222
+// const char *password = "YULIANAAMORMIO";
+const char *ssid = "WMSAS-TALLER";
+const char *password = "303wm2021";
 
 //---- MQTT Broker settings
 const char *mqtt_server = "a33454d332054780b8feaf83950ed54a.s2.eu.hivemq.cloud"; // replace with your broker url
