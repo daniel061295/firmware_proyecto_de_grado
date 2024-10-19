@@ -27,10 +27,10 @@ ESP32Time rtc(3600); // offset in seconds GMT+1
 const int csPin = 18; // LoRa radio chip select
 
 // wifi casa para pruebas
-// const char *ssid = "FAMILIA TORRES CARDENAS";2222
-// const char *password = "YULIANAAMORMIO";
-const char *ssid = "WMSAS-TALLER";
-const char *password = "303wm2021";
+const char *ssid = "FAMILIA TORRES CARDENAS";
+const char *password = "YULIANAAMORMIO";
+// const char *ssid = "WMSAS-TALLER";
+// const char *password = "303wm2021";
 
 //---- MQTT Broker settings
 const char *mqtt_server = "a33454d332054780b8feaf83950ed54a.s2.eu.hivemq.cloud"; // replace with your broker url
@@ -55,6 +55,7 @@ char usec[30];
 bool timeflag = false;
 bool lectura_exitosa = false;
 
+String rssi = "RSSI --";
 
 // Initialize JSON Document with apropiate size
 DynamicJsonDocument doc(2048); // 4096
@@ -175,7 +176,7 @@ void setup()
         ;
 
     Heltec.begin(true /*DisplayEnable Enable*/, true /*Heltec.LoRa Disable*/, true /*Serial Enable*/, true /*PABOOST Enable*/, BAND /*long BAND*/);
-      
+    LoRa.setTxPower(17, RF_PACONFIG_PASELECT_PABOOST);
     // register the receive callback
     LoRa.onReceive(onReceive);
   
@@ -248,8 +249,9 @@ struct tm timeinfo = rtc.getTimeStruct();
     Heltec.display->drawString(90, 0, String(vars[0]));
     Heltec.display->drawString(0, 15, "Humedad: ");
     Heltec.display->drawString(90, 15, String(vars[1]));
-    Heltec.display->drawString(0, 30, "Timestamp:");
-    Heltec.display->drawString(0, 45, String(String(dateTime)));
+    //Heltec.display->drawString(0, 30, "Timestamp:");
+    Heltec.display->drawString(0, 30, String(String(dateTime)));
+    Heltec.display->drawString(0, 45, rssi);
     Heltec.display->display();
     flag = false;
   }
@@ -279,6 +281,7 @@ void onReceive(int packetSize)
   Serial.println(vars[0]);
   Serial.print("humedad:");
   Serial.println(vars[1]);
+  rssi = "RSSI " + String(LoRa.packetRssi(), DEC) ;
   flag = true;
 
 }

@@ -16,9 +16,9 @@ float temp;
 float hum;
 unsigned long startMillis; // some global variables available anywhere in the program
 unsigned long currentMillis;
-int timeInMinutes = 5;
-const unsigned long period = timeInMinutes*60e3;
-//const unsigned long period = 60e3;
+int timeInMinutes = 1;
+//const unsigned long period = timeInMinutes*60e3;
+const unsigned long period = 30e3;
 bool lectura_exitosa = false;
 void setup()
 {
@@ -32,6 +32,8 @@ void setup()
     Serial.println(F("DHTxx Unified Sensor Example"));
     // WIFI Kit series V1 not support Vext control
     Heltec.begin(true /*DisplayEnable Enable*/, true /*Heltec.LoRa Disable*/, true /*Serial Enable*/, true /*PABOOST Enable*/, BAND /*long BAND*/);
+    // LoRa.setTxPower(17, RF_PACONFIG_PASELECT_PABOOST);
+    // setTxPowerMax(int level);
     Heltec.display->init();
     Heltec.display->flipScreenVertically();  
     Heltec.display->setFont(ArialMT_Plain_10);
